@@ -104,6 +104,7 @@ long sgx_compat_ioctl(struct file *filep, unsigned int cmd, unsigned long arg)
 }
 #endif
 
+//:) 
 static int sgx_mmap(struct file *file, struct vm_area_struct *vma)
 {
 	vma->vm_ops = &sgx_vm_ops;
@@ -159,6 +160,7 @@ static const struct file_operations sgx_fops = {
 	.get_unmapped_area	= sgx_get_unmapped_area,
 };
 
+//:) 드라이버 명이 구나~!!! "isgx"
 static struct miscdevice sgx_dev = {
  .minor	= MISC_DYNAMIC_MINOR,
 	.name	= "isgx",
@@ -309,6 +311,7 @@ static int sgx_drv_probe(struct platform_device *pdev)
 		return -ENODEV;
 	}
 
+	//;)
 	if (!(fc & FEATURE_CONTROL_SGX_ENABLE)) {
 		pr_err("intel_sgx: SGX is not enabled\n");
 		return -ENODEV;
@@ -341,10 +344,12 @@ static int sgx_drv_remove(struct platform_device *pdev)
 	misc_deregister(&sgx_dev);
 
 	destroy_workqueue(sgx_add_page_wq);
+	//;) epc 뱅크...iounmap()을 해주는 구나!!!
 #ifdef CONFIG_X86_64
 	for (i = 0; i < sgx_nr_epc_banks; i++)
 		iounmap((void *)sgx_epc_banks[i].va);
 #endif
+	//;) 캐쉬 티어 다운~~!!
 	sgx_page_cache_teardown();
 
 	return 0;
